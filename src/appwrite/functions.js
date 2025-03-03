@@ -15,7 +15,8 @@ export async function createContact({
         const contactInAuth = await account.create(
             ID.unique(),
             email,
-            password
+            password,
+            name
         )
 
         if (!contactInAuth) {
@@ -87,6 +88,33 @@ export async function logoutContact(){
     }
 }
 
+export async function getCurrentUserDetails() {
+    try {
+
+        const userAuth =  await account.get()
+
+        if(!userAuth) {
+            throw "Failed to get user details"
+        }
+
+        const userDetails = await database.getDocument(
+            appwriteConfig.database_id,
+            appwriteConfig.contacts_collection_id,
+            userAuth.$id
+        )
+
+        return {
+            success: true,
+            message: "User details fetched successfully",
+            data: userDetails
+        }
+        
+    } catch (error) {
+        console.log("Failed to get user", error)
+        throw error
+    }
+}
+
 // Database functions
 export async function createCompany({
     name,
@@ -136,6 +164,66 @@ export async function createCompany({
 
     } catch (error) {
         console.log("Failed to create new company", error)
+        throw error
+    }
+}
+
+export async function createInteraction({type, notes, contactId}) {
+    try {
+
+        const newInteraction = await database.createDocument(
+            appwriteConfig.database_id,
+            appwriteConfig.interactions_collection_id,
+            ID.unique(),
+            {
+                type,
+                notes,
+                contact: contactId
+            }
+        )
+
+        if (!newInteraction) {
+            throw "Failed to create new interaction"
+        }
+
+        return {
+            success: true,
+            message: "New Interaction created",
+            data: newInteraction
+        }
+        
+    } catch (error) {
+        console.log("Failed to create new interaction", error)
+        throw error
+    }
+}
+
+export async function createDeal({contactId, expected_close_date, deal_amount}) {
+    try {
+        
+        const newDeal = await database.createDocument(
+            appwriteConfig.database_id,
+            appwriteConfig.deals_collection_id,
+            ID.unique(),
+            {
+                contact: contactId,
+                expected_close_date,
+                deal_amount
+            }
+        )
+
+        if(!newDeal){
+            throw "Failed to create new deal"
+        }
+
+        return {
+            success: true,
+            message: "New deal created",
+            data: newDeal
+        }
+
+    } catch (error) {
+        console.log("Failed to create new deal", error)
         throw error
     }
 }

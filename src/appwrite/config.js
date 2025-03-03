@@ -12,7 +12,6 @@ const appwriteConfig = {
 		.VITE_APPWRITE_DEALS_COLLECTION_ID,
 	interactions_collection_id: import.meta.env.VITE_APPWRITE_INTERACTIONS_COLLECTION_ID
 };
-deals
 const client = new Client();
 
 client
